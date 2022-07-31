@@ -29,7 +29,7 @@ async def joinPublicUserEntity():
     """
     entity = request.args.get('entity')
 
-    app.logger.info('[/joinPublicUserEntity] :: Entity Name {}'.format(entity))
+    app.logger.info(f'[/joinPublicUserEntity] :: Entity Name {entity}')
     try:
         msg = '/start'
         result = await telegram_client.get_entity(entity)
@@ -44,7 +44,7 @@ async def joinPublicEntity():
     Join Public Groups & Channels
     """
     entity = request.args.get('entity')
-    app.logger.info('[/joinPublicEntity] :: Entity Name {}'.format(entity))
+    app.logger.info(f'[/joinPublicEntity] :: Entity Name {entity}')
     try:
         result = await telegram_client(JoinChannelRequest(entity))
         return result.chats[0].to_dict()
@@ -60,7 +60,7 @@ async def joinPrivateEntity():
     Join Invation Link
     """
     hash = request.args.get('hash')
-    app.logger.info('[/joinPrivateEntity] :: Hash {}'.format(hash))
+    app.logger.info(f'[/joinPrivateEntity] :: Hash {hash}')
     try:
         result = await telegram_client(ImportChatInviteRequest(hash))
         return result.chats[0].to_dict()
@@ -79,7 +79,7 @@ async def getEntity():
     if (is_entity_id == '1'):
         entity = int(entity)
 
-    app.logger.info('[/getentity] :: Entity Name {}'.format(entity))
+    app.logger.info(f'[/getentity] :: Entity Name {entity}')
     try:
         result = await telegram_client.get_entity(entity)
         return result.to_dict()

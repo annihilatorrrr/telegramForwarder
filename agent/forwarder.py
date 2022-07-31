@@ -16,13 +16,12 @@ async def forwarder_event_handler(event):
         return
 
     is_group = event.is_group
-    is_channel = event.is_channel
     is_private = event.is_private
     message = event.message.message
     has_media = event.media
     sender_id = None
 
-    if is_channel:
+    if is_channel := event.is_channel:
         logger.info('Channel Message Received')
         sender_id = event.message.to_id.channel_id
 
@@ -64,8 +63,9 @@ async def forwarder_event_handler(event):
 
             # Allow premium users only
             if is_user_premium == 1:
-                should_filter = MessageFilter.filter_msg(redirection_id, event)
-                if should_filter:
+                if should_filter := MessageFilter.filter_msg(
+                    redirection_id, event
+                ):
                     return
 
                 if has_media:

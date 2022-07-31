@@ -13,7 +13,7 @@ class MessageFilter:
         if filter is None:
             return False
 
-        filter_dict = {
+        return {
             'id': filter[0],
             'audio': filter[1],
             'video': filter[2],
@@ -23,9 +23,8 @@ class MessageFilter:
             'hashtag': filter[6],
             'link': filter[7],
             'contain': filter[8],
-            'notcontain': filter[9]
+            'notcontain': filter[9],
         }
-        return filter_dict
 
     @staticmethod
     def get_active_filters(filter_dict):
@@ -37,13 +36,11 @@ class MessageFilter:
         if not isinstance(filter_dict, dict):
             raise ValueError('Provide a dictionary')
 
-        active_filter_list = []
-        for key, value in filter_dict.items():
-            if value != 0 and value is not None:
-                if key != 'id':
-                    active_filter_list.append(key)
-
-        return active_filter_list
+        return [
+            key
+            for key, value in filter_dict.items()
+            if value != 0 and value is not None and key != 'id'
+        ]
 
     @staticmethod
     def get_message_type(event):
@@ -64,7 +61,7 @@ class MessageFilter:
                     return 'link'
 
         # Text Messages
-        if event.media == None:
+        if event.media is None:
             return 'text'
 
         # Documents (audio, video, sticker, files)
@@ -73,11 +70,7 @@ class MessageFilter:
             return 'audio'
         if 'video' in mime_type:
             return 'video'
-        if 'image/webp' in mime_type:
-            return 'sticker'
-
-        # Anything else is a file
-        return 'document'
+        return 'sticker' if 'image/webp' in mime_type else 'document'
 
     @staticmethod
     def filter_msg(filter_id, message_event):
@@ -89,7 +82,7 @@ class MessageFilter:
         # Get Filter dictionary from database
         filter_dict = MessageFilter.get_filter(filter_id)
         if filter_dict == False:
-            logger.info('No filters for id : {}'.format(filter_id))
+            logger.info(f'No filters for id : {filter_id}')
             return False
 
         # Get Active Filter list
@@ -131,6 +124,8 @@ class MessageFilter:
                     contains_blacklist_word = True
                     break
 
-        logger.info('Contains word :: {} && Contains Blacklist :: {}'.format(
-            contains_required_word, contains_blacklist_word))
+        logger.info(
+            f'Contains word :: {contains_required_word} && Contains Blacklist :: {contains_blacklist_word}'
+        )
+
         return (not contains_required_word) or contains_blacklist_word
